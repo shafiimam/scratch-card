@@ -306,7 +306,7 @@ var Scratch = /*#__PURE__*/ (function (_Component) {
     var canvasStyle = {
       position: "absolute",
       top: 0,
-      zIndex: 1,
+      zIndex: 10,
     };
     var resultStyle = {
       visibility: this.state.loaded ? "visible" : "hidden",

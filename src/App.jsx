@@ -2,7 +2,7 @@ import { Typography, Box, Button } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import "./styles.css";
 import { getFontStyle } from "./utils/index";
-import Scratch from "./Scratch2";
+import Scratch from './Scratch';
 function App() {
   const [discountApplied, setDiscountApplied] = useState(false);
   const [scratchCardImage, setScratchCardImage] = useState(null);
@@ -59,9 +59,9 @@ function App() {
   }, []);
 
   let deviceWidth = window.innerWidth;
-
-  let isMobile = deviceWidth < 500;
-
+  console.log('device width',deviceWidth);
+  let isMobile = deviceWidth < 600;
+  console.log('is mobile device', isMobile);
   if (isSelectedProducts) {
     willShowWidget = selectedProducts.some(
       (product) => product.handle === currentProductHandle
@@ -89,8 +89,8 @@ function App() {
           seletectedCustomScratchCardStyle
         );
         const canvas = document.querySelector(".ScratchCard__Canvas");
-        // const scratchCard = new Scratch(canvas, selectedCustomCardImage,scWidth,height);
-        // scratchCard.render();
+        const scratchCard = new Scratch(canvas, selectedCustomCardImage,scWidth,height);
+        scratchCard.render();
         setScratchCardImage(selectedCustomCardImage);
       } else {
         const imagesrc = `https://cdn.jsdelivr.net/gh/shafiimam/scratch-card-app/scratch-card-style/${scratchCardStyle
@@ -108,8 +108,8 @@ function App() {
             .join("-")}.png`
         );
         const canvas = document.querySelector(".ScratchCard__Canvas");
-        // const scratchCard = new Scratch(canvas, imagesrc, scWidth, height);
-        // scratchCard.render();
+        const scratchCard = new Scratch(canvas, imagesrc, scWidth, height);
+        scratchCard.render();
       }
     }
   }, [willShowWidget, scWidth]);
@@ -149,13 +149,13 @@ function App() {
   if (willShowWidget) {
     console.log("widget will show");
     contentToRender = (
-      <div className="scratch-card-app">
+      <Box className='scratch-card-app' ref={containerRef}>
         <Typography
           sx={{
             ...titleFontStyleToUse,
-            width: "100%",
+            width: '100%',
             fontSize: `${titleFontSize}px`,
-            textAlign: titleTextAlignCenter && "center",
+            textAlign: titleTextAlignCenter && 'center',
           }}
         >
           {title}
@@ -163,97 +163,86 @@ function App() {
         <Typography
           sx={{
             ...subTitleFontStyleToUse,
-            width: "100%",
+            width: '100%',
             fontSize: `${subtitleFontSize}px`,
-            textAlign: subtitleTextAlignCenter && "center",
+            textAlign: subtitleTextAlignCenter && 'center',
           }}
         >
           {subTitle}
         </Typography>
         <Box
-          className="root-container-sc"
+          className='root-container-sc'
           sx={{
-            marginTop: "10px",
-            marginBottom: "10px",
-            ".ScratchCard__Canvas": {
-              borderRadius: `${borderRadius}px`,
-              margin: 0,
-              padding: 0,
+            marginTop: '10px',
+            marginBottom: '10px',
+            border: `${borderWidth}px solid ${borderColor}`,
+            borderRadius: `${borderRadius}px`,
+            width: `100%`,
+            height: `${height}px !important`,
+            zIndex: 4,
+            backgroundColor: bgColor,
+            '.ScratchCard__Canvas': {
+              borderRadius: `${borderRadius-5}px`,
+              MozBorderRadius: `${borderRadius}px`,
+              overflow: 'hidden',
               zIndex: 1,
             },
           }}
-          ref={containerRef}
         >
           <Box
-            className="ScratchCard__Container"
+            className='ScratchCard__Container'
             sx={{
-              position: "relative",
-              width: `${scWidth}px !important`,
-              height: `${height}px !important`,
-              border: `${borderWidth}px solid ${borderColor}`,
-              borderRadius: `${borderRadius}px`,
+              position: 'relative',
+              height: '100%',
             }}
           >
-            {/* <canvas
+            <canvas
               width={scWidth}
               height={height}
-              id="scratch"
-              className="ScratchCard__Canvas"
+              id='scratch'
+              className='ScratchCard__Canvas'
               style={{
-                position: "absolute",
-                borderRadius: `${borderRadius}px`,
-                transform: "translate(-50%, -50%)",
-                top: "50%",
-                left: "50%",
-                userSelect: "none",
+                position: 'absolute',
+                userSelect: 'none',
               }}
-            ></canvas> */}
-            <Scratch
-              width={scWidth}
-              height={height}
-              image={
-                "https://cdn.jsdelivr.net/gh/shafiimam/scratch-card-app/scratch-card-style/style-1.png"
-              }
-              finishPercent={80}
+            ></canvas>
+            <Box
+              className='sc-code-container'
+              sx={{
+                display: 'none',
+                flexDirection: 'column',
+                height: '100%',
+                width: '100%',
+                margin: '0 auto',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: `${borderRadius}px`,
+              }}
             >
-              <Box
+              <Typography
+                variant='h6'
                 sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  height: "99%",
-                  width: "99%",
-                  margin: "0 auto",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: `${borderRadius}px`,
-                  backgroundColor: bgColor,
+                  fontSize: `${fontSize}px`,
+                  color: textColor,
                 }}
               >
-                <Typography
-                  variant="h6"
-                  sx={{
-                    fontSize: `${fontSize}px`,
-                    color: textColor,
-                  }}
-                >
-                  {codeToShow}
-                </Typography>
-                <Button
-                  variant="text"
-                  sx={{
-                    color: textColor,
-                    borderRadius: 0,
-                  }}
-                  disabled={discountApplied}
-                  onClick={applyDiscount}
-                >
-                  {discountApplied ? "Applied On Checkout" : "Apply Discount"}
-                </Button>
-              </Box>
-            </Scratch>
+                {codeToShow}
+              </Typography>
+              <Button
+                variant='text'
+                sx={{
+                  color: textColor,
+                  borderRadius: 0,
+                }}
+                disabled={discountApplied}
+                onClick={applyDiscount}
+              >
+                {discountApplied ? 'Applied On Checkout' : 'Apply Discount'}
+              </Button>
+            </Box>
           </Box>
         </Box>
-      </div>
+      </Box>
     );
   }
 
