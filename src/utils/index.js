@@ -1,27 +1,39 @@
 export const getFontStyle = (style) => {
   switch (style) {
-    case "regular":
+    case 'regular':
       return {
-        fontWeight: "500",
+        fontWeight: '500',
       };
-    case "bold":
+    case 'bold':
       return {
-        fontWeight: "800",
+        fontWeight: '800',
       };
-    case "italic":
+    case 'italic':
       return {
-        fontStyle: "italic",
+        fontStyle: 'italic',
       };
-    case "light-italic":
+    case 'light-italic':
       return {
         fontWeight: 100,
-        fontStyle: "italic",
+        fontStyle: 'italic',
       };
-    case "light":
+    case 'light':
       return {
         fontWeight: 100,
       };
     default:
       return;
   }
+};
+
+export const determineWIllWidgetShow = (
+  selectedProducts,
+  currentProductHandle,
+  productSelection
+) => {
+  console.log({ selectedProducts, currentProductHandle, productSelection });
+  if(productSelection === 'all-products') return true;
+  return selectedProducts.some(
+    (product) => product.handle === currentProductHandle
+  );
 };

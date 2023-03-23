@@ -1,37 +1,27 @@
 export default class Scratch {
   constructor(canvas, imageSrc, width, height) {
     this.isDrawing = false;
-    this.canvas = canvas;
+    this.canvas = document.querySelector('.ScratchCard__Canvas');
     this.width = width;
     this.height = height;
     this.lastPoint = null;
     this.ctx = this.canvas.getContext('2d');
-    this.image = new Image();
-    this.image.crossOrigin = 'Anonymous';
-    this.scratchCardContainer = document.querySelector('.sc-code-container');
-    this.scratchedOnce = localStorage.getItem('scratchedOnce') === 'true';
-    this.image.onload = () => {
-      if(!this.scratchedOnce) this.ctx.drawImage(this.image, 0, 0, width, height);
-      this.scratchCardContainer.style.display = 'flex';
-    };
-    this.image.src = imageSrc;
-    this.image.style.height = '100%';
-    this.image.style.width = '100%';
     this.appURL = 'https://scratch-card-app.herokuapp.com';
-    this.scReportSent = localStorage.getItem('scReportSent') === 'true';
+    this.scReportSent = sessionStorage.getItem('scReportSent') === 'true';
+    this.scratchCardContainer = document.querySelector('.sc-code-container');
+    this.scratchedOnce = sessionStorage.getItem('scratchedOnce') === 'true';
   }
 
   async sendReport() {
-    console.log('sending sc report');
     const { scReportSent } = this;
     if (scReportSent) return;
     const shop = Shopify?.shop ? Shopify?.shop : window.location.hostname;
-    const sendReport = await fetch(`${this.appURL}/analytics/report?shop=${shop}`);
+    const sendReport = await fetch(
+      `${this.appURL}/analytics/report?shop=${shop}`
+    );
     const response = await sendReport.json();
     const isSuccess = response.message === 'success';
-    if(isSuccess) this.scReportSent  = true;
-    localStorage.setItem('scReportSent', true);
-    console.log('report sent', response);
+    if (isSuccess) this.scReportSent = true;
   }
 
   getFilledInPixels(stride) {
@@ -58,9 +48,8 @@ export default class Scratch {
     return Math.round((count / total) * 100);
   }
 
-  getScratchCardState(){
-    if(this.scratchedOnce){
-      console.log('already scratched');
+  getScratchCardState() {
+    if (this.scratchedOnce) {
       this.canvas.style.transition = '1s';
       this.canvas.style.opacity = '0';
       this.canvas.style.zIndex = '0';
@@ -106,15 +95,20 @@ export default class Scratch {
     if (this.isFinished) {
       return;
     }
-
     const finishPercent = 70;
 
     if (filledInPixels > finishPercent) {
       this.canvas.style.transition = '1s';
-      this.canvas.style.opacity = '0';
       this.canvas.style.zIndex = '0';
+      this.canvas.style.opacity = '0';
       this.isFinished = true;
-      localStorage.setItem('scratchedOnce', true);
+      let reportSent = sessionStorage.getItem('scReportSent');
+      if (reportSent !== 'true') {
+        sessionStorage.setItem('scReportSent', true);
+        this.sendReport();
+      } else {
+      }
+      sessionStorage.setItem('scratchedOnce', true);
     }
   }
 
@@ -124,6 +118,8 @@ export default class Scratch {
   };
 
   handleTouchMove = (e) => {
+    const codeContainer = document.querySelector('.sc-code-container');
+    if (codeContainer) codeContainer.style.opacity = 1;
     const currentPoint = this.getMouse(e, this.canvas);
     const distance = this.distanceBetween(this.lastPoint, currentPoint);
     const angle = this.angleBetween(this.lastPoint, currentPoint);
@@ -146,14 +142,13 @@ export default class Scratch {
         );
       } else {
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 20, 0, 2 * Math.PI, false);
+        this.ctx.arc(x, y, 30, 0, 2 * Math.PI, false);
         this.ctx.fill();
       }
     }
 
     this.lastPoint = currentPoint;
     this.handlePercentage(this.getFilledInPixels(32));
-    this.sendReport();
   };
 
   handleMouseMove = (e) => {
@@ -182,14 +177,13 @@ export default class Scratch {
         );
       } else {
         this.ctx.beginPath();
-        this.ctx.arc(x, y, 20, 0, 2 * Math.PI, false);
+        this.ctx.arc(x, y, 30, 0, 2 * Math.PI, false);
         this.ctx.fill();
       }
     }
 
     this.lastPoint = currentPoint;
     this.handlePercentage(this.getFilledInPixels(32));
-    this.sendReport();
   };
 
   handleMouseUp = () => {
@@ -197,11 +191,11 @@ export default class Scratch {
   };
 
   render() {
-    // this.getScratchCardState();
-    this.canvas.addEventListener('mousedown', this.handleMouseDown);
     this.canvas.addEventListener('touchstart', this.handleTouchMove);
-    this.canvas.addEventListener('mousemove', this.handleMouseMove);
-    this.canvas.addEventListener('mouseup', this.handleMouseUp);
+    this.canvas.addEventListener('mousemove', function () {
+      const codeContainer = document.querySelector('.sc-code-container');
+      if (codeContainer) codeContainer.style.opacity = 1;
+    });
     this.canvas.addEventListener('touchmove', this.handleTouchMove);
     this.canvas.addEventListener('touchend', this.handleMouseUp);
   }
