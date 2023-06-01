@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom/client';
 import App from './App';
 
 async function fetchScratchCardDiscounts() {
-  const today = new Date();
+  const devMode = import.meta.env.DEV;  
   const configInStore = sessionStorage.getItem('scratchCardConfig');
-
+  
+  const today = new Date();
   if (configInStore === null || configInStore === undefined) {
-    const shop =
-      localStorage.getItem('shop') || 'awesome-sauce-123.myshopify.com';
+    const shop = !devMode
+      ? localStorage.getItem('shop')
+      : 'scratchzone-app-staging.myshopify.com';
     let shopConfig = await fetch(
       `https://scratch-card-app.herokuapp.com/public/shopConfig?shop=${shop}`
     ).then((res) => res.json());
@@ -17,7 +19,7 @@ async function fetchScratchCardDiscounts() {
   } else {
     const expiration = configInStore.expiration;
     if (today > expiration) {
-      localStorage.removeItem('currentSessionScratchCardCode');
+      localStorage.removeItem('currentSessionScratchCardCodeIndex');
     }
   }
   return true;
