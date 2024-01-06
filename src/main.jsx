@@ -12,7 +12,7 @@ async function fetchScratchCardDiscounts() {
       ? localStorage.getItem('shop')
       : 'scratchzone-app-staging.myshopify.com';
     let shopConfig = await fetch(
-      `https://scratch-card-app.herokuapp.com/public/shopConfig?shop=${shop}`
+      `https://super-scratch-a4e9e223558a.herokuapp.com/public/shopConfig?shop=${shop}`
     ).then((res) => res.json());
     shopConfig.expiration = today.setDate(today.getDate() + 1);
     sessionStorage.setItem('scratchCardConfig', JSON.stringify(shopConfig));

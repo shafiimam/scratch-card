@@ -49,7 +49,7 @@ function App() {
     sessionStorage.setItem('scReportSent', true);
     sessionStorage.setItem('scratchedOnce', true);
     const sendReport = await fetch(
-      `https://scratch-card-app.herokuapp.com/analytics/report?shop=${shop}`
+      `https://super-scratch-a4e9e223558a.herokuapp.com/analytics/report?shop=${shop}&timeStamp=${Date.now()}`
     );
     const response = await sendReport.json();
     const isSuccess = response.message === 'success';
@@ -191,7 +191,7 @@ function App() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
         }}
       >
         <Typography
